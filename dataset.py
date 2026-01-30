@@ -47,25 +47,25 @@ class HAM10000Dataset(Dataset):
         return len(self.metadata)
 
     def __getitem__(self, idx):
-        # Allow indexing by tensor (common in PyTorch samplers)
+        # If idx is tensor, make it a number
         if torch.is_tensor(idx):
-            idx = idx.tolist()
-
+            idx = idx.item()
+            
         if self.cache_images:
-            # If idx is a list (batch), handle it? No, dataset usually returns typically one item. 
-            # But just in case idx is an int here.
+            #get Cached Image
             image = self.images_cache[idx]
         else:
-            # Use specific column name 'isic_id' instead of index 1
+            #get Image from disk
             img_name = os.path.join(self.image_dir, self.metadata.iloc[idx]['isic_id'] + '.jpg')
             image = Image.open(img_name).convert('RGB')
 
-        # Use specific column name 'diagnosis_1'
+        #get Diagnosis
         diagnosis = self.metadata.iloc[idx]['diagnosis_1']
         
         # Binary label: Benign -> 0, Malignant -> 1
         label = 1 if diagnosis == 'Malignant' else 0
 
+        #transform image for training or eval, depending on given parameter
         if self.transform:
             image = self.transform(image)
 
