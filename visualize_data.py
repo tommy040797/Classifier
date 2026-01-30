@@ -31,7 +31,7 @@ def visualize():
     ])
 
     # Load dataset (no cache needed for visualization)
-    dataset = HAM10000Dataset(csv_file=csv_file, image_dir=image_dir, transform=transform, cache_images=False)
+    dataset = HAM10000Dataset(csv_file=csv_file, image_dir=image_dir, transform=transform, cache_images=True)
     dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
     # Get a batch
