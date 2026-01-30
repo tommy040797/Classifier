@@ -2,18 +2,16 @@ import torch
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 from dataset import HAM10000Dataset
 from torch.utils.data import DataLoader
 
 def denormalize(tensor, mean, std):
-    """Reverses the normalization on a tensor."""
+    #REverse normalization
     mean = torch.tensor(mean).view(3, 1, 1)
     std = torch.tensor(std).view(3, 1, 1)
     return tensor * std + mean
 
 def visualize():
-    # Paths
     csv_file = r'x:\Code\Classifier\archive\ham10000\metadata.csv'
     image_dir = r'x:\Code\Classifier\archive\ham10000'
     
@@ -22,7 +20,7 @@ def visualize():
     std = [0.229, 0.224, 0.225]
     
     transform = transforms.Compose([
-        transforms.Resize(256),             # Resize shortest side to 256
+        transforms.Resize(256),        
         transforms.RandomCrop(224),  
         transforms.RandomHorizontalFlip(), # Show augmentation too
         transforms.RandomRotation(20),
@@ -30,7 +28,7 @@ def visualize():
         transforms.Normalize(mean=mean, std=std)
     ])
 
-    # Load dataset (no cache needed for visualization)
+    # Load dataset
     dataset = HAM10000Dataset(csv_file=csv_file, image_dir=image_dir, transform=transform, cache_images=True)
     dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 

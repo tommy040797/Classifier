@@ -27,10 +27,10 @@ class HAM10000Dataset(Dataset):
         self.metadata = self.metadata[self.metadata['diagnosis_1'].isin(['Benign', 'Malignant'])]
         
         # Filter metadata to include only rows where image exists
-        # Use 'isic_id' based on user correction and verification
         self.metadata = self.metadata[self.metadata['isic_id'].apply(self._check_image_exists)]  
         self.metadata.reset_index(drop=True, inplace=True)
 
+        #image caching, for fun, doesnt really do anything but i feel better
         if self.cache_images:
             print("Caching images into RAM...")
             for idx in tqdm(range(len(self.metadata))):
