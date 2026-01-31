@@ -2,3 +2,5 @@ archive/
 archive.zip
 __pycache__/
 preprocessing_sample.png
+best_model.pth
+.venv/

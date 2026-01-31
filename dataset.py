@@ -71,7 +71,23 @@ class HAM10000Dataset(Dataset):
 
         return image, label
 
-"""def get_dataloaders(csv_file, image_dir, batch_size=32, val_split=0.1, test_split=0.1, num_workers=4, cache_images=False):
+
+#Transformator shenanigans for different transforms on train/val
+class TransformedSubset(Dataset):
+    def __init__(self, subset, transform=None):
+        self.subset = subset
+        self.transform = transform
+        
+    def __getitem__(self, idx):
+        x, y = self.subset[idx] 
+        if self.transform:
+            x = self.transform(x)
+        return x, y
+    
+    def __len__(self):
+        return len(self.subset)
+
+def get_dataloaders(csv_file, image_dir, batch_size=32, val_split=0.1, test_split=0.1, num_workers=4, cache_images=False):
     import torchvision.transforms as transforms
     from torch.utils.data import Subset
 
@@ -115,30 +131,16 @@ class HAM10000Dataset(Dataset):
         generator=torch.Generator().manual_seed(42)
     )
     
-    # 3. Create wrapper to apply transforms
-    class TransformedSubset(Dataset):
-        def __init__(self, subset, transform=None):
-            self.subset = subset
-            self.transform = transform
-            
-        def __getitem__(self, idx):
-            x, y = self.subset[idx] 
-            if self.transform:
-                x = self.transform(x)
-            return x, y
-        
-        def __len__(self):
-            return len(self.subset)
-
-    # 4. Wrap subsets
+    # 3. Wrap subsets
     train_data = TransformedSubset(train_subset, transform=train_transform)
     val_data = TransformedSubset(val_subset, transform=eval_transform)
     test_data = TransformedSubset(test_subset, transform=eval_transform)
 
     # 5. Create DataLoaders
+    # Reduced num_workers to 0 to avoid potential multiprocessing issues on Windows prompt if not guarded main
+    # But usually 4 is fine if code is in main block. Let's keep 4 (param default) unless it crashes.
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=num_workers)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
     return train_loader, val_loader, test_loader
-"""
